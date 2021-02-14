@@ -4,45 +4,55 @@
 #include <bits/stdc++.h>
 #include <vector>
 #include "cryless/cry.h"
+#include <thread>
+#include <string>
 
-int calc_rain(const std::vector<int> &input)
+void one_row(const std::vector<int> &input, std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, int level)
 {
-    std::vector<int> levels;
+    bool flag = false;
+    int val = 0;
     int end = 0;
-    for(auto index : input)
+    for(; index != stop; index++)
     {
-        if(levels.size() <= index)
+        if(!flag and *index >= level)
         {
-            for(int i = levels.size(); i < index; i++)
-                levels.push_back(0);
+            val = 0;
+            end = 0;
+            flag = true;
         }
-        for(auto [i, lvl] : cry::enumerate(levels))
+        if(*index < level)
+            val++;
+        else if(flag)
         {
-            if(i + 1 > index)
-                lvl++;
-            else
-            {
-                end += lvl;
-                lvl = 0;
-            }
+            end += val;
+            val = 0;
         }
     }
-    return end;
+    std::cout << "Level " + std::to_string(level) + ": " + std::to_string(end) << std::endl;
+}
+
+int calc(int a, int b)
+{
+    return a * b;
 }
 
 int main()
 {
-    std::vector<int> input{0,1,0,2,1,0,1,3,2,1,2,1};
-    std::cout << "Expected 6: " << calc_rain(input) << std::endl;
+    const std::vector<int> input{0,1,0,2,1,0,1,3,2,1,2,1};
+    std::vector<std::thread> ts;
+    for(int i = 1; i <= 3; i++)
+       ts.push_back(std::thread{one_row, input, input.begin(), input.end(), i});
+    for(int i = 0; i < 3; i++)
+        ts[i].join();
 
-    input = {4,2,0,3,2,5};
-    std::cout << "Expected 9: " << calc_rain(input) << std::endl;
+    //input = {4,2,0,3,2,5};
+    //std::cout << "Expected 9: " << calc_rain(input) << std::endl;
 
-    input = {5,2,0,3,2,5};
-    std::cout << "Expected 13: " << calc_rain(input) << std::endl;
+    //input = {5,2,0,3,2,5};
+    //std::cout << "Expected 13: " << calc_rain(input) << std::endl;
 
-    input = {6,5,2,0,3,2,5};
-    std::cout << "Expected 13: " << calc_rain(input) << std::endl;
+    //input = {6,5,2,0,3,2,5};
+    //std::cout << "Expected 13: " << calc_rain(input) << std::endl;
 
     return 0;
 }
