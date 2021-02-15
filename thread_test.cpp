@@ -16,7 +16,7 @@ int main()
     cry::Thread_Pool pool{std::thread::hardware_concurrency()};
 
     for(auto el : vec)
-        result.push_back( pool.enqueue( [] {
+        result.push_back( pool.enqueue( [el] {
                     return mult(2, el);
                     } ) );
     return 0;
