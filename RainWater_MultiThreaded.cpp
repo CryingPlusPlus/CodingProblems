@@ -1,9 +1,6 @@
 //https://leetcode.com/problems/trapping-rain-water/
 #include <iostream>
-#include <tuple>
-#include <bits/stdc++.h>
 #include <vector>
-#include "cryless/cry.h"
 #include <thread>
 #include <string>
 

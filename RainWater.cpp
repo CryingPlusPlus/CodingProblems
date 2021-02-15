@@ -9,22 +9,16 @@ int calc_rain(const std::vector<int> &input)
 {
     std::vector<int> levels;
     int end = 0;
+    bool temp_state = false;
     for(auto index : input)
     {
-        if(levels.size() <= index)
-        {
-            for(int i = levels.size(); i < index; i++)
-                levels.push_back(0);
-        }
+        for(int i = levels.size(); i < index * (levels.size() <= index); i++)
+            levels.push_back(0);
         for(auto [i, lvl] : cry::enumerate(levels))
         {
-            if(i + 1 > index)
-                lvl++;
-            else
-            {
-                end += lvl;
-                lvl = 0;
-            }
+            temp_state = (i + 1 > index);
+            end += lvl * !temp_state;
+            lvl = lvl * temp_state + temp_state;
         }
     }
     return end;
