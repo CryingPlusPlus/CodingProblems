@@ -1,3 +1,6 @@
 [submodule ".\\cryless"]
 	path = .\\cryless
 	url = https://github.com/CryingPlusPlus/cryless
+[submodule "cryless"]
+	path = cryless
+	url = https://github.com/CryingPlusPlus/cryless

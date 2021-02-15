@@ -88,58 +88,8 @@ auto fill()
     return end;
 }
 
-class Master
-{
-    public:
-        int max_height = 0;
-        const std::vector<int> input;
-        std::vector<std::future<int>> output;
-        Master(std::vector<int> input)
-        {
-            this->input = input;
-        }
-        ~Master(){}
-        static int one_row(std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, const int level, Master &self)
-        {
-            int val = 0;
-            int end = 0;
-            bool temp_state;
-
-            for(; index != stop; index++)
-            {
-                if(*index > self->max_height)
-                    self->expand(*index, index, stop);
-                temp_state = level > *index;
-                end += val * !temp_state;
-                val = val * temp_state + temp_state;
-            }
-            return end;
-        }
-
-        int expand(const int n_height, std::vector<int>::const_iterator start, std::vector<int>::const_iterator stop)
-        {
-            for(; max_height <= n_height; max_height++)
-                this -> output.push_back(std::async(one_row, start, stop, max_height, std::ref(this)));
-        }
-
-        int get_output()
-        {
-            int end = 0;
-            for(int i = 0; i < output.size(); i++)
-                end += output[i].get();
-            return end;
-        }
-
-};
-
 int main()
 {
-    //std::cout << speed(fill()) << std::endl;
-    std::vector<int> input{0, 1, 2, 0, 0, 2, 1};
-    std::cout << calc_rain(input) << std::endl;
-
-    Master m{input};
-    m.expand(0, m.input.begin(), m.input.end());
-    std::cout << m.get_output() << std::endl;
+    std::cout << speed(fill()) << std::endl;
     return 0;
 }
