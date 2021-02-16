@@ -44,7 +44,7 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
     auto son = [](std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, const int level){
         Control ctrl;
         for(; index != stop; index++)
-            ctrl(level > *index);
+            ctrl(level > *index)
         return ctrl.end;
     };
 
@@ -56,6 +56,7 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
                         ));
         ctrl(level > *index);
     }
+
     for(auto &f : futures)
         ctrl.end += f.get();
     return ctrl.end;
