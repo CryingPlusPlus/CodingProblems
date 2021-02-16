@@ -59,7 +59,6 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
     for(auto &f : futures)
         ctrl.end += f.get();
     return ctrl.end;
-
 }
 
 auto speed(const std::vector<int> &input)
@@ -85,7 +84,7 @@ auto fill()
 {
     std::vector<int> end;
     end.reserve(1000000);
-    srand(100);
+    srand((int) std::time(nullptr));
     for(int i = 0; i < 1000000; i++)
         end.push_back(rand() % 100);
     return end;
@@ -94,16 +93,15 @@ auto fill()
 int main()
 {
     std::cout << speed(fill()) << std::endl;
-    //std::vector<int> input{1, 2, 0, 0, 2};
-    //std::cout << calc_rain(input.begin(), input.end()) << std::endl;
-    //input = {4,2,0,3,2,5};
-    //std::cout << "Expected 9: " << calc_rain(input.begin(), input.end()) << std::endl;
-
-    //input = {5,2,0,3,2,5};
-    //std::cout << "Expected 13: " << calc_rain(input.begin(), input.end()) << std::endl;
-
-    //input = {6,5,2,0,3,2,5};
-    //std::cout << "Expected 13: " << calc_rain(input.begin(), input.end()) << std::endl;
+    std::cout << std::endl;
+    std::cout << speed(fill()) << std::endl;
+    std::cout << std::endl;
+    std::cout << speed(fill()) << std::endl;
+    std::cout << std::endl;
+    std::cout << speed(fill()) << std::endl;
+    std::cout << std::endl;
+    std::cout << speed(fill()) << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }
