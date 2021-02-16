@@ -28,17 +28,15 @@ struct Control
     int val = 0;
     bool temp_state;
 
-    void alter(const bool temp_state)
+    void operator () (const bool temp_state)
     {
         end += val * !temp_state;
         val = val * temp_state + temp_state;
     }
 };
 
-int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop)
+int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, cry::Thread_Pool &t_pool)
 {
-    cry::Thread_Pool t_pool{4};
-
     std::vector<std::future<int>> futures;
     int level = 0;
     Control ctrl;
@@ -46,7 +44,7 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
     auto son = [](std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, const int level){
         Control ctrl;
         for(; index != stop; index++)
-            ctrl.alter(level > *index);
+            ctrl(level > *index);
         return ctrl.end;
     };
 
@@ -56,7 +54,7 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
             futures.push_back(t_pool.enqueue(
                         [index, level, son, stop] {return son(index, stop, level);}
                         ));
-        ctrl.alter(level > *index);
+        ctrl(level > *index);
     }
     for(auto &f : futures)
         ctrl.end += f.get();
@@ -66,6 +64,7 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
 
 auto speed(const std::vector<int> &input)
 {
+    cry::Thread_Pool t_pool{4};
     std::future<int> f;
     std::time_t start = std::time(nullptr);
 
@@ -73,7 +72,7 @@ auto speed(const std::vector<int> &input)
 
     std::time_t ende1 = std::time(nullptr);
 
-    std::cout << calc_rain2(input.begin(), input.end()) << std::endl;
+    std::cout << calc_rain2(input.begin(), input.end(), std::ref(t_pool)) << std::endl;
 
     std::time_t ende2 = std::time(nullptr);
     
