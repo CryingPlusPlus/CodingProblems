@@ -28,6 +28,7 @@ struct Control
 {
     int end = 0;
     int val = 0;
+    bool temp_state;
 
     void operator () (const bool temp_state)
     {
@@ -44,7 +45,8 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
 
     auto son = [](std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, const int level){
         Control ctrl;
-        std::for_each(index, stop, [&](auto index){ctrl(level > index);});
+        for(; index != stop; index++)
+            ctrl(level > *index);
         return ctrl.end;
     };
 
@@ -57,33 +59,41 @@ int calc_rain2(std::vector<int>::const_iterator index, std::vector<int>::const_i
         ctrl(level > *index);
     }
 
-    std::for_each(futures.begin(), futures.end(), [&ctrl](auto &f){ctrl.end += f.get();});
+    for(auto &f : futures)
+        ctrl.end += f.get();
     return ctrl.end;
 }
 
+int max(std::vector<int> vec)
+{
+    std::sort(vec);
+    return vec.back();
+}
 
-int calc_rain3(const std::vector<int> &input, cry::Thread_Pool &t_pool)
+int calc_rain3(std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, cry::Thread_Pool &t_pool)
 {
     std::vector<std::future<int>> futures;
-    futures.reserve(*std::max_element(input.begin(), input.end()));
+    futures.reserve(*std::max_element(index, stop));
     int level = 0;
     Control ctrl;
 
     auto son = [](std::vector<int>::const_iterator index, std::vector<int>::const_iterator stop, const int level){
         Control ctrl;
-        std::for_each(index, stop, [&](auto index){ctrl(level > index);});
-        return ctrl.end;
+        std::for_each(index, stop, [&ctrl, level](auto index){ ctrl(level > index); });
+        return std::move(ctrl.end);
     };
-    auto daddy = [&](auto &index){
-        for(; level < *index; level++)
+
+    auto daddy = [stop, &t_pool, &level, &ctrl, son, &futures](auto index){
+        for(; level < *index; ++level)
             futures.push_back(t_pool.enqueue(
-                        [=, &input] {return son(index, input.end(), level);}
+                        [index, level, son, stop] {return std::move(son(index, stop, level));}
                         ));
         ctrl(level > *index);
     };
-    cry::for_each_iterator(input.begin(), input.end(), daddy);
-    std::for_each(futures.begin(), futures.end(), [&ctrl](auto &f){ctrl.end += f.get();});
-    return ctrl.end;
+
+    cry::for_each_iterator(index, stop, daddy);
+    std::for_each(futures.begin(), futures.end(), [&ctrl](auto &f){ ctrl.end += f.get(); });
+    return std::move(ctrl.end);
 }
 
 auto speed(const std::vector<int> &input)
@@ -100,7 +110,7 @@ auto speed(const std::vector<int> &input)
 
     std::time_t ende2 = std::time(nullptr);
     
-    std::cout << calc_rain3(input, std::ref(t_pool)) << std::endl;
+    std::cout << calc_rain3(input.begin(), input.end(), std::ref(t_pool)) << std::endl;
 
     std::time_t ende3 = std::time(nullptr);
 
